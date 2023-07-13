@@ -1,6 +1,15 @@
 import telebot
+import sqlite3
 
 bot = telebot.TeleBot('This_must_be_TelegramBot`s_access_Token')
+connectDB = sqlite3.connect('Creds_Data_Base.db')
+cursorDB = connectDB.cursor()
+cursorDB.execute('CREATE TABLE IF NOT EXISTS CredsDT('
+                            'Telegram_ID TEXT PRIMARY KEY,'
+                            'user_name TEXT, '
+                            'PickleCreds BLOB)')
+connectDB.commit()
+connectDB.close()
 
 
 @bot.message_handler(commands=['start'])
@@ -16,5 +25,19 @@ def start_bot(message):
                      f"Hi! How I`m may help you {message.from_user.first_name} ?",
                      reply_markup=markup)
 
+
+@bot.callback_query_handler(func=lambda call: call.data == 'auth')
+def auth(call):
+    pass
+
+
+@bot.callback_query_handler(func=lambda call: call.data == 'events')
+def get_events(call):
+    pass
+
+
+@bot.callback_query_handler(func=lambda call: call.data == 'send')
+def send_event(call):
+    pass
 
 bot.polling(non_stop=True)

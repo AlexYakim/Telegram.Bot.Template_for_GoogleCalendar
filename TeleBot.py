@@ -43,7 +43,19 @@ def start_bot(message):
 
 @bot.callback_query_handler(func=lambda call: call.data == 'auth')
 def auth(call):
-    pass
+    flow = InstalledAppFlow.from_client_secrets_file('credentials.json', SCOPES)
+    creds = flow.run_local_server(port=0)
+    first_name = call.message.chat.first_name
+    if (call.message.chat.last_name != None):
+        last_name = call.message.chat.last_name
+        first_name += ' ' + last_name
+    connect = sqlite3.connect('Creds_Data_Base.db')
+    cursor = connect.cursor()
+    pickle_file = pickle.dumps(creds)
+    cursor.execute('INSERT INTO CredsDT(Telegram_ID,user_name, PickleCreds)'
+                   'VALUES(?,?,?);', (call.message.chat.id, first_name + ' ', pickle_file))
+    connect.commit()
+    connect.close()
 
 
 @bot.callback_query_handler(func=lambda call: call.data == 'events')
